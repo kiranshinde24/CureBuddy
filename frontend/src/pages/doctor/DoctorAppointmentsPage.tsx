@@ -29,8 +29,14 @@ const DoctorAppointmentsPage: React.FC = () => {
         const data = await res.json();
         if (!data.success) throw new Error(data.message);
 
-        setAppointments(data.data || []);
-        setFiltered(data.data || []);
+        // Filter upcoming appointments only
+        const now = new Date();
+        const upcoming = data.data?.filter(
+          (appt: any) => new Date(appt.appointmentDate) >= now
+        ) || [];
+
+        setAppointments(upcoming);
+        setFiltered(upcoming);
       } catch (err: any) {
         setError(err.message || "Failed to fetch");
       } finally {
@@ -66,7 +72,7 @@ const DoctorAppointmentsPage: React.FC = () => {
   return (
     <div className="max-w-5xl mx-auto p-6 bg-gray-50 min-h-screen">
       <h2 className="text-2xl font-bold mb-6 text-blue-800 text-center">
-        My Appointments
+        Upcoming Appointments
       </h2>
 
       {/* Filters */}
@@ -101,7 +107,7 @@ const DoctorAppointmentsPage: React.FC = () => {
       )}
 
       {filtered.length === 0 ? (
-        <p className="text-center text-gray-500">No appointments found.</p>
+        <p className="text-center text-gray-500">No upcoming appointments.</p>
       ) : (
         <div className="divide-y divide-gray-200 rounded-md border bg-white shadow-sm">
           {filtered.map((appt, idx) => (
