@@ -22,8 +22,14 @@ app.use(
 // Parse JSON request bodies
 app.use(express.json());
 
-// Serve uploaded images/docs
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// ✅ Serve uploaded images/docs with proper CORS headers
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  setHeaders: (res, path) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  },
+}));
 
 /* ──────────────────────────  DATABASE  ─────────────────────────── */
 
@@ -41,8 +47,6 @@ mongoose
 const adminRoutes = require('./routes/adminRoutes');
 const authRoutes = require('./routes/auth');
 const doctorRoutes = require('./routes/doctorRoutes');
-
-// 🆕 NEW appointment routes 🆕
 const appointmentRoutes = require('./routes/appointments');
 
 // Mount routes
@@ -51,7 +55,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/doctors', doctorRoutes);
 app.use('/api/appointments', appointmentRoutes);
 
-// Health‑check
+// Health check
 app.get('/', (_req, res) => res.send('✅ CureBuddy API is running...'));
 
 /* ──────────────────────────  START SERVER  ─────────────────────── */
