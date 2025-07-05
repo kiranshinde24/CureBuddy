@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 
 interface Patient {
   _id: string;
@@ -15,9 +16,9 @@ const AdminPatientsPage: React.FC = () => {
   const [search, setSearch] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
+  useEffect(() => {
     if (!token) {
       setError("Authorization token missing.");
       setLoading(false);
@@ -65,6 +66,39 @@ const AdminPatientsPage: React.FC = () => {
 
     setFiltered(results);
   }, [search, selectedDate, patients]);
+
+  // 🧹 Handle deletion
+  const deletePatient = async (id: string) => {
+    const confirm = await Swal.fire({
+      title: "Are you sure?",
+      text: "This patient will be permanently deleted.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#e53e3e",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/patients/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (!data.success) throw new Error(data.message);
+
+      setPatients((prev) => prev.filter((p) => p._id !== id));
+      Swal.fire("Deleted!", "Patient has been removed.", "success");
+    } catch (err: any) {
+      Swal.fire("Error", err.message || "Failed to delete patient", "error");
+    }
+  };
 
   return (
     <main className="flex-1 bg-gray-100 p-8 min-h-screen">
@@ -117,6 +151,7 @@ const AdminPatientsPage: React.FC = () => {
                 <th className="p-3">Name</th>
                 <th className="p-3">Email</th>
                 <th className="p-3">Registered On</th>
+                <th className="p-3">Action</th>
               </tr>
             </thead>
             <tbody className="text-gray-800">
@@ -131,6 +166,14 @@ const AdminPatientsPage: React.FC = () => {
                       month: "short",
                       year: "numeric",
                     })}
+                  </td>
+                  <td className="p-3">
+                    <button
+                      onClick={() => deletePatient(p._id)}
+                      className="text-red-600 hover:underline"
+                    >
+                      Remove
+                    </button>
                   </td>
                 </tr>
               ))}
