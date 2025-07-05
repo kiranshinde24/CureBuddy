@@ -1,0 +1,70 @@
+Folder PATH listing for volume New Volume
+Volume serial number is 8C6B-8A01
+F:.
+|   api.ts
+|   App.css
+|   App.tsx
+|   frontend-structure.txt
+|   index.css
+|   main.tsx
+|   styles.css
+|   
++---assets
+|       doctor-hero.jpg
+|       doctor-profile.jpg
+|       Doctor.png
+|       image 2222.jpg
+|       images (1).jpeg
+|       images.jpeg
+|       Images3333.png
+|       Images333333.jpeg
+|       Logo.jpg
+|       react.svg
+|       
++---components
+|       AboutUs.jsx
+|       AdminSidebar.tsx
+|       AllDoctorsPage.jsx
+|       ContactUs.jsx
+|       CTASection.jsx
+|       DoctorClinicHospitalForm.tsx
+|       DoctorConsultationForm.tsx
+|       DoctorImageUpload.tsx
+|       DoctorList.tsx
+|       DoctorProfessionalInfoPage.tsx
+|       DoctorProfilePage.jsx
+|       DoctorsSection.jsx
+|       Footer.jsx
+|       Hero.jsx
+|       HomePage.jsx
+|       Navbar.jsx
+|       Profile.jsx
+|       SearchBar.jsx
+|       Sidebar.tsx
+|       Topbar.tsx
+|       
++---context
+|       DoctorContext.tsx
+|       
++---layout
+|       AdminLayout.tsx
+|       
+\---pages
+    |   AuthPage.tsx
+    |   DoctorClinicHospitalPage.tsx
+    |   DoctorConsultationPage.tsx
+    |   DoctorDocumentUploadPage.tsx
+    |   DoctorPersonalInfoPage.tsx
+    |   DoctorProfessionalInfoPage.tsx
+    |   DoctorRegistrationFlow.tsx
+    |   RegistrationSubmittedPage.tsx
+    |   
+    \---admin
+            AdminAppointmentsPage.tsx
+            AdminApprovedDoctorsPage.tsx
+            AdminDashboardPage.tsx
+            AdminPendingDoctorsPage.tsx
+            AdminRejectedDoctorsPage.tsx
+            DoctorDetailPage.tsx
+            DoctorListPage.tsx
+            
