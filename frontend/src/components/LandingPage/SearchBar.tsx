@@ -112,7 +112,6 @@ const SearchBar = () => {
       {/* Search Panel */}
       <div className="w-full max-w-6xl mx-auto px-4 py-6">
         <div className="bg-[#F0F4FF] rounded-lg shadow-md p-4 flex flex-col lg:flex-row items-start lg:items-center gap-4">
-
           {/* LEFT: City Search */}
           <div className="relative w-full lg:w-1/3">
             <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 bg-white">
@@ -184,7 +183,7 @@ const SearchBar = () => {
                 <img
                   src={
                     doctor.profileImage
-                      ? `http://localhost:5000/uploads/${doctor.profileImage}`
+                      ? `${import.meta.env.VITE_API_URL}/uploads/${doctor.profileImage}`
                       : "/default-doctor.jpg"
                   }
                   onError={(e) => (e.currentTarget.src = "/default-doctor.jpg")}

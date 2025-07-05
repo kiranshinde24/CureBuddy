@@ -1,8 +1,5 @@
-// DoctorsGrid.tsx or DoctorsGrid.jsx
 import React, { useState, useEffect } from "react";
-
 import { fetchApprovedDoctors } from "../../apis/doctorApi";
-
 import { useNavigate } from "react-router-dom";
 
 // Doctor type
@@ -20,7 +17,7 @@ const DoctorCard = ({ doctor }: { doctor: Doctor }) => (
       <img
         src={
           doctor.profileImage
-            ? `http://localhost:5000/uploads/${doctor.profileImage}`
+            ? `${import.meta.env.VITE_API_URL}/uploads/${doctor.profileImage}`
             : "/default-doctor.jpg"
         }
         onError={(e) => (e.currentTarget.src = "/default-doctor.jpg")}
@@ -87,7 +84,6 @@ const DoctorsGrid = () => {
         </div>
       )}
 
-      {/* White space at bottom */}
       <div className="h-16"></div>
     </section>
   );
