@@ -34,5 +34,5 @@ backend/.env
 frontend/.env
 
 # Uploaded Files (optional but highly recommended)
-uploads/
-backend/uploads/
+# uploads/
+# backend/uploads/
