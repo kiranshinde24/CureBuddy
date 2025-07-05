@@ -1,17 +1,20 @@
 require('dotenv').config();
-const express  = require('express');
+const express = require('express');
 const mongoose = require('mongoose');
-const cors     = require('cors');
-const path     = require('path');
+const cors = require('cors');
+const path = require('path');
 
 const app = express();
 
 /* ──────────────────────────  MIDDLEWARE  ────────────────────────── */
 
-// Allow requests from Vite dev‑server (port 5173)
+// ✅ Allow requests from local and deployed frontend (Vercel)
 app.use(
   cors({
-    origin: 'http://localhost:5173',
+    origin: [
+      'http://localhost:5173',           // Local frontend
+      'https://cure-buddy.vercel.app',   // Deployed frontend on Vercel
+    ],
     credentials: true,
   })
 );
@@ -35,23 +38,23 @@ mongoose
 /* ────────────────────────────  ROUTES  ─────────────────────────── */
 
 // Core route files
-const adminRoutes       = require('./routes/adminRoutes');
-const authRoutes        = require('./routes/auth');
-const doctorRoutes      = require('./routes/doctorRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const authRoutes = require('./routes/auth');
+const doctorRoutes = require('./routes/doctorRoutes');
 
-// 🆕  NEW  appointment routes  🆕
+// 🆕 NEW appointment routes 🆕
 const appointmentRoutes = require('./routes/appointments');
 
 // Mount routes
-app.use('/api/admin',        adminRoutes);
-app.use('/api/auth',         authRoutes);
-app.use('/api/doctors',      doctorRoutes);
-app.use('/api/appointments', appointmentRoutes);   // ← added line ✅
+app.use('/api/admin', adminRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/doctors', doctorRoutes);
+app.use('/api/appointments', appointmentRoutes);
 
 // Health‑check
 app.get('/', (_req, res) => res.send('✅ CureBuddy API is running...'));
 
-/* ──────────────────────────  START  ───────────────────────────── */
+/* ──────────────────────────  START SERVER  ─────────────────────── */
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
