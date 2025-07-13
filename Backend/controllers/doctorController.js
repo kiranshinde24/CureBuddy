@@ -2,7 +2,7 @@
   const mongoose      = require('mongoose');
 
   /* ------------------------------------------------------------------ */
-  /* 🔵  Doctor registration                                            */
+  /*  Doctor registration                                            */
   /* ------------------------------------------------------------------ */
   exports.registerDoctor = async (req, res) => {
     try {
@@ -78,7 +78,7 @@
   };
 
   /* ------------------------------------------------------------------ */
-  /* 🔵  Logged‑in doctor profile (dashboard)                           */
+  /*  Logged‑in doctor profile (dashboard)                           */
   /* ------------------------------------------------------------------ */
   exports.getLoggedInDoctorProfile = async (req, res) => {
     try {
@@ -106,7 +106,7 @@
   };
 
   /* ------------------------------------------------------------------ */
-  /* 🔵  Admin actions: approve / reject                                */
+  /*  Admin actions: approve / reject                                */
   /* ------------------------------------------------------------------ */
   exports.approveDoctor = async (req, res) => {
     try {
@@ -155,7 +155,7 @@
   };
 
   /* ------------------------------------------------------------------ */
-  /* 🔵  Fetch lists                                                    */
+  /*  Fetch lists                                                    */
   /* ------------------------------------------------------------------ */
 
   /**
@@ -185,7 +185,7 @@
   };
 
   /* ------------------------------------------------------------------ */
-  /* 🔵  Fetch single doctor by ID (public)                             */
+  /*   Fetch single doctor by ID (public)                             */
   /* ------------------------------------------------------------------ */
   exports.getDoctorById = async (req, res) => {
     try {
