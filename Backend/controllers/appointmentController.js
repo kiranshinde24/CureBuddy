@@ -15,7 +15,7 @@ exports.bookAppointment = async (req, res) => {
       return res.status(400).json({ message: "Slot already booked" });
     }
 
-    // 👇 Get patient's name using their ID
+    // Get patient's name using their ID
     const user = await User.findById(userId);
     const userName = user?.fullName || "Unknown";
 
@@ -25,7 +25,7 @@ exports.bookAppointment = async (req, res) => {
       appointmentDate,
       appointmentTime,
       userId,
-      userName // ✅ store name
+      userName 
     });
 
     await newAppointment.save();
