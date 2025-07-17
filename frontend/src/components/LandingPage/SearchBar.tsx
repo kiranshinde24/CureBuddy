@@ -184,7 +184,7 @@ const SearchBar = () => {
                 <img
                   src={
                     doctor.profileImage
-                      ? `http://localhost:5000/uploads/${doctor.profileImage}`
+                      ? `${import.meta.env.VITE_API_URL}/uploads/${doctor.profileImage}`
                       : "/default-doctor.jpg"
                   }
                   onError={(e) => (e.currentTarget.src = "/default-doctor.jpg")}
