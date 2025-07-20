@@ -114,7 +114,7 @@ const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        {/* 🌐 Public Pages */}
+        {/*  Public Pages */}
         <Route path="/" element={<PageLayout><LandingPage /></PageLayout>} />
         <Route path="/about" element={<PageLayout><AboutUs /></PageLayout>} />
         <Route path="/contact" element={<PageLayout><ContactUs /></PageLayout>} />
@@ -123,10 +123,10 @@ const App: React.FC = () => {
         <Route path="/login" element={<PageLayout><LoginPage /></PageLayout>} />
         <Route path="/signup" element={<PageLayout><SignupPage /></PageLayout>} />
 
-        {/* 👨‍⚕️ Doctor Registration Flow */}
+        {/* 👨‍⚕ Doctor Registration Flow */}
         <Route path="/doctor/register" element={<DoctorRegistrationFlow />} />
 
-        {/* 👨‍⚕️ Doctor Pages (with Sidebar) */}
+        {/*  Doctor Pages (with Sidebar) */}
         <Route path="/doctor" element={<DoctorLayout />}>
           <Route path="registration-submitted" element={<RegistrationSubmittedPage />} />
           <Route path="dashboard" element={<ProtectedRoute allowedRoles={["doctor"]}><DoctorDashboard /></ProtectedRoute>} />
@@ -135,7 +135,7 @@ const App: React.FC = () => {
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
 
-        {/* 🧑‍⚕️ Patient Pages */}
+        {/*  Patient Pages */}
         <Route path="/patient/dashboard" element={
           <ProtectedRoute allowedRoles={["patient"]}><PatientDashboard /></ProtectedRoute>
         } />
@@ -146,7 +146,7 @@ const App: React.FC = () => {
           <ProtectedRoute allowedRoles={["patient"]}><AppointmentHistoryPage /></ProtectedRoute>
         } />
 
-        {/* 🛠️ Admin Pages */}
+        {/* 🛠 Admin Pages */}
         <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><AdminLayout /></ProtectedRoute>}>
           <Route index element={<AdminDashboardPage />} />
           <Route path="appointments" element={<AdminAppointmentsPage />} />
@@ -158,7 +158,7 @@ const App: React.FC = () => {
           <Route path="patients" element={<AdminPatientsPage />} />
         </Route>
 
-        {/* 🔁 Fallback */}
+        {/*  Fallback */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
