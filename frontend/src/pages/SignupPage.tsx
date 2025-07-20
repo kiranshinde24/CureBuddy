@@ -81,7 +81,7 @@ const SignupPage: React.FC = () => {
 
       const data = await res.json();
       if (data.success) {
-        // ✅ Save userId in localStorage for doctor
+        
         if (role === "doctor") {
           localStorage.setItem("userId", data.user._id); // ensure backend sends user._id
         }
@@ -151,7 +151,7 @@ const SignupPage: React.FC = () => {
               className={`bg-yellow-500 text-white px-4 py-2 rounded w-full ${isOtpVerified ? "opacity-50 cursor-not-allowed" : ""}`}
               disabled={isOtpVerified}
             >
-              {isOtpVerified ? "OTP Verified ✅" : "Verify OTP"}
+              {isOtpVerified ? "OTP Verified " : "Verify OTP"}
             </button>
           )}
 
