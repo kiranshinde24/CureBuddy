@@ -104,3 +104,61 @@ exports.login = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "15m" });
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS,
+      },
+    });
+
+    const resetLink = `http://localhost:5173/reset-password/${user._id}/${token}`;
+
+    await transporter.sendMail({
+      to: email,
+      from: `"CureBuddy" <${process.env.MAIL_USER}>`,
+      subject: "Reset Your CureBuddy Password",
+      html: `<p>Click <a href="${resetLink}">here</a> to reset your password. This link will expire in 15 minutes.</p>`,
+    });
+
+    return res.status(200).json({ success: true, message: "Reset password email sent" });
+  } catch (err) {
+    console.error("Forgot Password Error:", err);
+    return res.status(500).json({ success: false, message: "Failed to send reset email" });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  const { id, token } = req.params;
+  const { password } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (decoded.id !== id) {
+      return res.status(403).json({ success: false, message: "Invalid token" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    user.password = hashedPassword;
+    await user.save();
+
+    return res.status(200).json({ success: true, message: "Password updated successfully" });
+  } catch (err) {
+    console.error("Reset Password Error:", err);
+    return res.status(400).json({ success: false, message: "Token expired or invalid" });
+  }
+};
