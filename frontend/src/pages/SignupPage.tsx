@@ -1,4 +1,3 @@
-// src/pages/SignupPage.tsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -220,5 +219,4 @@ const SignupPage: React.FC = () => {
 };
 
 export default SignupPage;
-
 
