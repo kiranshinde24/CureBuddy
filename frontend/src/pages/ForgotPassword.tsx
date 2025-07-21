@@ -26,7 +26,7 @@ const ForgotPassword = () => {
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
-      <Toaster position="top-center" reverseOrder={false} />
+{/*       <Toaster position="top-center" reverseOrder={false} /> */}
       <form
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded-xl shadow-md w-full max-w-md"
