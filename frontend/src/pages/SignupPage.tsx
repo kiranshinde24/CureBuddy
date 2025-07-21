@@ -1,6 +1,7 @@
 // src/pages/SignupPage.tsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const SignupPage: React.FC = () => {
   const navigate = useNavigate();
@@ -26,12 +27,14 @@ const SignupPage: React.FC = () => {
       const data = await res.json();
       if (data.success) {
         setOtpSent(true);
-        alert("OTP sent successfully! Check your email.");
+        toast.success("OTP sent successfully!");
       } else {
         setError(data.message || "Error sending OTP.");
+        toast.error(data.message || "Failed to send OTP");
       }
     } catch {
       setError("Error contacting the server.");
+      toast.error("Network error while sending OTP.");
     }
   };
 
@@ -47,12 +50,14 @@ const SignupPage: React.FC = () => {
       const data = await res.json();
       if (data.success) {
         setIsOtpVerified(true);
-        alert("OTP verified successfully!");
+        toast.success("OTP verified!");
       } else {
         setError(data.message || "Invalid OTP.");
+        toast.error(data.message || "Invalid OTP");
       }
     } catch {
       setError("Error verifying OTP.");
+      toast.error("Network error while verifying OTP.");
     }
   };
 
@@ -81,24 +86,29 @@ const SignupPage: React.FC = () => {
 
       const data = await res.json();
       if (data.success) {
-        
+        toast.success(`Signed up successfully as ${role}. Redirecting...`);
         if (role === "doctor") {
-          localStorage.setItem("userId", data.user._id); // ensure backend sends user._id
-        }
-
-        alert(`Signup successful as ${role}. Redirecting...`);
-        if (role === "doctor") {
-          navigate("/doctor/register");
+          localStorage.setItem("userId", data.user._id);
+          setTimeout(() => navigate("/doctor/register"), 1000);
         } else {
-          navigate("/login");
+          setTimeout(() => navigate("/login"), 1000);
         }
       } else {
         setError(data.message || "Signup failed.");
+        toast.error(data.message || "Signup failed.");
       }
     } catch {
       setError("Error contacting the server.");
+      toast.error("Network error during signup.");
     }
   };
+
+  const isFormComplete =
+    email &&
+    isOtpVerified &&
+    fullName &&
+    password &&
+    (role === "patient" || (confirmPassword && password === confirmPassword));
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
@@ -121,7 +131,7 @@ const SignupPage: React.FC = () => {
           </button>
         </div>
 
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+        {error && <p className="text-red-500 mb-4 text-sm">{error}</p>}
 
         <form onSubmit={handleSignup} className="space-y-4">
           <input
@@ -132,7 +142,11 @@ const SignupPage: React.FC = () => {
             onChange={(e) => setEmail(e.target.value)}
           />
 
-          <button type="button" onClick={sendOtp} className="bg-indigo-500 text-white px-4 py-2 rounded w-full">
+          <button
+            type="button"
+            onClick={sendOtp}
+            className="bg-indigo-500 text-white px-4 py-2 rounded w-full"
+          >
             Send OTP
           </button>
 
@@ -148,10 +162,12 @@ const SignupPage: React.FC = () => {
             <button
               type="button"
               onClick={verifyOtp}
-              className={`bg-yellow-500 text-white px-4 py-2 rounded w-full ${isOtpVerified ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`bg-yellow-500 text-white px-4 py-2 rounded w-full ${
+                isOtpVerified ? "opacity-50 cursor-not-allowed" : ""
+              }`}
               disabled={isOtpVerified}
             >
-              {isOtpVerified ? "OTP Verified " : "Verify OTP"}
+              {isOtpVerified ? "OTP Verified" : "Verify OTP"}
             </button>
           )}
 
@@ -183,8 +199,10 @@ const SignupPage: React.FC = () => {
 
           <button
             type="submit"
-            className="bg-indigo-500 text-white w-full p-2 rounded font-semibold"
-            disabled={!isOtpVerified}
+            className={`w-full p-2 rounded font-semibold text-white ${
+              isFormComplete ? "bg-indigo-500" : "bg-gray-400 cursor-not-allowed"
+            }`}
+            disabled={!isFormComplete}
           >
             {role === "doctor" ? "Next" : "Sign Up"}
           </button>
@@ -202,3 +220,4 @@ const SignupPage: React.FC = () => {
 };
 
 export default SignupPage;
+
