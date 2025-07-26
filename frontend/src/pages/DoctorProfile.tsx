@@ -33,7 +33,7 @@ const DoctorProfile: React.FC = () => {
 
   useEffect(() => {
     if (id) {
-      fetch(`http://localhost:5000/api/doctors/${id}`)
+      fetch(`${import.meta.env.VITE_API_URL}/api/doctors/${id}`)
         .then((res) => res.json())
         .then((data) => {
           if (data.success) {
@@ -61,7 +61,7 @@ const DoctorProfile: React.FC = () => {
     }
     setLoadingSlots(true);
     axios
-      .get(`http://localhost:5000/api/appointments?doctorId=${id}&date=${selectedDate}`)
+      .get(`${import.meta.env.VITE_API_URL}/api/appointments?doctorId=${id}&date=${selectedDate}`)
       .then((res) => {
         if (res.data.success) {
           const slots = res.data.appointments.map(
@@ -95,7 +95,7 @@ const DoctorProfile: React.FC = () => {
     slot: string,
     token: string
   ) => {
-    const response = await fetch("http://localhost:5000/api/appointments/book", {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/appointments/book`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -137,7 +137,7 @@ const handleBooking = async () => {
   }
 
   try {
-    const response = await fetch("http://localhost:5000/api/appointments/book", {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/appointments/book`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -182,7 +182,7 @@ const handleBooking = async () => {
         <img
           src={
             doctor.profilePicture
-              ? `http://localhost:5000/uploads/${doctor.profilePicture}`
+              ? `${import.meta.env.VITE_API_URL}/uploads/${doctor.profilePicture}`
               : "/default-doctor.jpg"
           }
           onError={(e) => (e.currentTarget.src = "/default-doctor.jpg")}
