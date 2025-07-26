@@ -6,6 +6,7 @@ import axios from "axios";
 interface Doctor {
   _id: string;
   name: string;
+  email?: string; // ✅ Add this line
   specialization: string;
   profilePicture?: string;
   professionalInfo?: {
@@ -32,7 +33,7 @@ const DoctorProfile: React.FC = () => {
 
   useEffect(() => {
     if (id) {
-      fetch(`${import.meta.env.VITE_API_URL}/api/doctors/${id}`)
+      fetch(`http://localhost:5000/api/doctors/${id}`)
         .then((res) => res.json())
         .then((data) => {
           if (data.success) {
@@ -60,7 +61,7 @@ const DoctorProfile: React.FC = () => {
     }
     setLoadingSlots(true);
     axios
-      .get(`${import.meta.env.VITE_API_URL}/api/appointments?doctorId=${id}&date=${selectedDate}`)
+      .get(`http://localhost:5000/api/appointments?doctorId=${id}&date=${selectedDate}`)
       .then((res) => {
         if (res.data.success) {
           const slots = res.data.appointments.map(
@@ -94,7 +95,7 @@ const DoctorProfile: React.FC = () => {
     slot: string,
     token: string
   ) => {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/appointments/book`, {
+    const response = await fetch("http://localhost:5000/api/appointments/book", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -136,20 +137,23 @@ const handleBooking = async () => {
   }
 
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/appointments/book`, {
+    const response = await fetch("http://localhost:5000/api/appointments/book", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${storedToken}`,
       },
-      body: JSON.stringify({
-        doctorId: id,
-        doctorName: doctor?.name || "Unknown",
-        patientId: storedUser._id,
-        patientName: storedUser.fullName || storedUser.name || "Unknown",
-        appointmentDate: selectedDate,
-        appointmentTime: selectedTime,
-      }),
+   
+    body: JSON.stringify({
+  doctorId: id,
+  doctorName: doctor?.name || "Unknown",
+  doctorEmail: doctor?.email || "", // ✅ Add this line
+  patientId: storedUser._id,
+  patientName: storedUser.fullName || storedUser.name || "Unknown",
+  patientEmail: storedUser.email || "", // ✅ Add this line (optional if backend needs it)
+  appointmentDate: selectedDate,
+  appointmentTime: selectedTime,
+}),
     });
 
     const data = await response.json();
@@ -178,7 +182,7 @@ const handleBooking = async () => {
         <img
           src={
             doctor.profilePicture
-              ? `${import.meta.env.VITE_API_URL}/uploads/${doctor.profilePicture}`
+              ? `http://localhost:5000/uploads/${doctor.profilePicture}`
               : "/default-doctor.jpg"
           }
           onError={(e) => (e.currentTarget.src = "/default-doctor.jpg")}

@@ -1,11 +1,19 @@
 require('dotenv').config();
-const express = require('express');
+const cron = require('node-cron');
+//require("./utils/reminderScheduler"); // ⬅️ Add this line
+const sendReminders = require('./utils/sendReminders');
+
+cron.schedule('*/15 * * * *', async () => {
+  console.log('⏱️ Checking for 24-hour reminders...');
+  await sendReminders();
+});
+
+const express  = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
-const path = require('path');
+const cors     = require('cors');
+const path     = require('path');
 
 const app = express();
-
 /* ──────────────────────────  MIDDLEWARE  ────────────────────────── */
 
 // ✅ Allow requests from local and deployed frontend (Vercel)
