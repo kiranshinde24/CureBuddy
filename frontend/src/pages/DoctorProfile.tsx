@@ -2,16 +2,19 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import axios from "axios";
+import toast from "react-hot-toast"; 
 
 interface Doctor {
   _id: string;
   name: string;
-  email?: string; // ✅ Add this line
-  specialization: string;
+  email?: string;
   profilePicture?: string;
   professionalInfo?: {
     qualification?: string;
-    experience?: string;
+    specialization?: string;
+    university?: string;
+    licenseNo?: string;
+    yearsOfExperience?: number;
   };
   consultationInfo?: {
     fee?: number;
@@ -45,11 +48,13 @@ const DoctorProfile: React.FC = () => {
           } else {
             setDoctor(null);
             setAvailableDates([]);
+            toast.error("Failed to load doctor profile.");
           }
         })
         .catch(() => {
           setDoctor(null);
           setAvailableDates([]);
+          toast.error("Error fetching doctor data.");
         });
     }
   }, [id]);
@@ -86,93 +91,52 @@ const DoctorProfile: React.FC = () => {
     return out;
   };
 
-  const bookAppointment = async (
-    doctorId: string,
-    doctorName: string,
-    patientId: string,
-    patientName: string,
-    date: string,
-    slot: string,
-    token: string
-  ) => {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/appointments/book`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        doctorId,
-        doctorName,
-        patientId,
-        patientName,
-        appointmentDate: date,
-        appointmentTime: slot,
-      }),
-    });
+  const handleBooking = async () => {
+    if (!selectedDate || !selectedTime) {
+      toast.error("Please select a date and time slot.");
+      return;
+    }
 
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to book appointment");
+    const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+    const storedToken = localStorage.getItem("token");
+
+    if (!storedUser?._id || !storedToken) {
+      toast.error("Please login first to book an appointment.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/appointments/book`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${storedToken}`,
+        },
+        body: JSON.stringify({
+          doctorId: id,
+          doctorName: doctor?.name || "Unknown",
+          doctorEmail: doctor?.email || "",
+          patientId: storedUser._id,
+          patientName: storedUser.fullName || storedUser.name || "Unknown",
+          patientEmail: storedUser.email || "",
+          appointmentDate: selectedDate,
+          appointmentTime: selectedTime,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to book appointment");
+      }
+
+      toast.success(" Appointment booked successfully!");
+      navigate("/patient/appointments");
+    } catch (error: any) {
+      console.error("❌ Booking error:", error);
+      toast.error(error.message || "Something went wrong while booking.");
     }
   };
-
-const handleBooking = async () => {
-  if (!selectedDate || !selectedTime) {
-    alert("Please select a date and time slot.");
-    return;
-  }
-
-  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-  const storedToken = localStorage.getItem("token");
-
-  console.log("📦 User from localStorage:", storedUser);
-  console.log("🔐 Token:", storedToken);
-  console.log("📅 Date:", selectedDate);
-  console.log("⏰ Time:", selectedTime);
-
-  if (!storedUser?._id || !storedToken) {
-    alert("Please login first to book an appointment.");
-    return;
-  }
-
-  try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/appointments/book`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${storedToken}`,
-      },
-   
-    body: JSON.stringify({
-  doctorId: id,
-  doctorName: doctor?.name || "Unknown",
-  doctorEmail: doctor?.email || "", // ✅ Add this line
-  patientId: storedUser._id,
-  patientName: storedUser.fullName || storedUser.name || "Unknown",
-  patientEmail: storedUser.email || "", // ✅ Add this line (optional if backend needs it)
-  appointmentDate: selectedDate,
-  appointmentTime: selectedTime,
-}),
-    });
-
-    const data = await response.json();
-
-    console.log("📥 Server response:", data);
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to book appointment");
-    }
-
-    alert("✅ Appointment booked successfully!");
-    navigate("/patient/appointments");
-  } catch (error: any) {
-    console.error("❌ Booking error:", error);
-    alert(error.message || "Something went wrong while booking.");
-  }
-};
-
-
 
   if (!doctor) return <p className="p-8 text-center">Loading…</p>;
 
@@ -190,11 +154,19 @@ const handleBooking = async () => {
         />
         <div>
           <h2 className="text-2xl font-bold">Dr. {doctor.name}</h2>
-          <p className="text-sm text-gray-600">{doctor.specialization}</p>
-          <p className="text-sm text-gray-500">
-            {doctor.professionalInfo?.qualification} &nbsp;|&nbsp;
-            {doctor.professionalInfo?.experience} yrs
+
+          <p className="text-sm text-gray-600">
+            {doctor.professionalInfo?.specialization || "Specialization not available"}
           </p>
+
+          <p className="text-sm text-gray-500">
+            {doctor.professionalInfo?.qualification || "Qualification not specified"}
+            {doctor.professionalInfo?.yearsOfExperience !== undefined &&
+              doctor.professionalInfo.yearsOfExperience > 0 && (
+                <> &nbsp;|&nbsp;{doctor.professionalInfo.yearsOfExperience} yrs</>
+              )}
+          </p>
+
           {doctor.consultationInfo?.fee !== undefined && (
             <p className="text-sm text-gray-700 mt-1">
               Fee: ₹{doctor.consultationInfo.fee}
