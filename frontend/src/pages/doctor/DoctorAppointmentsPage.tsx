@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast"; 
 
 const DoctorAppointmentsPage: React.FC = () => {
   const [appointments, setAppointments] = useState<any[]>([]);
@@ -13,19 +14,22 @@ const DoctorAppointmentsPage: React.FC = () => {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      setError("You are not logged in.");
+      toast.error("You are not logged in."); 
       setLoading(false);
       return;
     }
 
     const fetchAppointments = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/appointments/doctor/me`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/appointments/doctor/me`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         const data = await res.json();
         if (!data.success) throw new Error(data.message);
@@ -33,6 +37,7 @@ const DoctorAppointmentsPage: React.FC = () => {
         setAppointments(data.data || []);
         setFiltered(data.data || []);
       } catch (err: any) {
+        toast.error(err.message || "Failed to fetch"); 
         setError(err.message || "Failed to fetch");
       } finally {
         setLoading(false);
@@ -55,7 +60,8 @@ const DoctorAppointmentsPage: React.FC = () => {
     if (selectedDate) {
       results = results.filter(
         (appt) =>
-          new Date(appt.appointmentDate).toISOString().split("T")[0] === selectedDate
+          new Date(appt.appointmentDate).toISOString().split("T")[0] ===
+          selectedDate
       );
     }
 
@@ -65,31 +71,43 @@ const DoctorAppointmentsPage: React.FC = () => {
   // 🔹 Cancel handler
   const handleCancelAppointment = async (appointmentId: string) => {
     const token = localStorage.getItem("token");
-    if (!token) return alert("Not logged in");
+    if (!token) {
+      toast.error("Not logged in"); 
+      return;
+    }
 
-    const confirmCancel = window.confirm("Are you sure you want to cancel this appointment?");
+    const confirmCancel = window.confirm(
+      "Are you sure you want to cancel this appointment?"
+    );
     if (!confirmCancel) return;
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/appointments/${appointmentId}/cancel-by-doctor`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/appointments/${appointmentId}/cancel-by-doctor`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       const data = await res.json();
       if (!data.success) throw new Error(data.message);
 
-      // Update UI
+      
       setAppointments((prev) =>
         prev.map((appt) =>
-          appt._id === appointmentId ? { ...appt, status: "Cancelled" } : appt
+          appt._id === appointmentId
+            ? { ...appt, status: "Cancelled" }
+            : appt
         )
       );
+
+      toast.success("Appointment cancelled successfully"); 
     } catch (error: any) {
-      alert(error.message || "Failed to cancel appointment.");
+      toast.error(error.message || "Failed to cancel appointment."); 
     }
   };
 
@@ -102,7 +120,7 @@ const DoctorAppointmentsPage: React.FC = () => {
         My Appointments
       </h2>
 
-      {/* 🔹 Filters */}
+      {/*  Filters */}
       <div className="flex flex-col md:flex-row gap-4 mb-6 justify-between">
         <input
           type="text"
@@ -133,7 +151,7 @@ const DoctorAppointmentsPage: React.FC = () => {
         </div>
       )}
 
-      {/* 🔹 Appointment List */}
+      {/*  Appointment List */}
       {filtered.length === 0 ? (
         <p className="text-center text-gray-500">No appointments found.</p>
       ) : (
@@ -145,7 +163,8 @@ const DoctorAppointmentsPage: React.FC = () => {
                   {appt.patientName}
                 </p>
                 <p className="text-sm text-gray-500">
-                  {new Date(appt.appointmentDate).toLocaleDateString()} at {appt.appointmentTime}
+                  {new Date(appt.appointmentDate).toLocaleDateString()} at{" "}
+                  {appt.appointmentTime}
                 </p>
               </div>
 
@@ -162,14 +181,15 @@ const DoctorAppointmentsPage: React.FC = () => {
                   {appt.status || "Scheduled"}
                 </span>
 
-                {appt.status !== "Completed" && appt.status !== "Cancelled" && (
-                  <button
-                    onClick={() => handleCancelAppointment(appt._id)}
-                    className="text-sm text-red-600 hover:text-red-800 underline"
-                  >
-                    Cancel
-                  </button>
-                )}
+                {appt.status !== "Completed" &&
+                  appt.status !== "Cancelled" && (
+                    <button
+                      onClick={() => handleCancelAppointment(appt._id)}
+                      className="text-sm text-red-600 hover:text-red-800 underline"
+                    >
+                      Cancel
+                    </button>
+                  )}
               </div>
             </div>
           ))}
