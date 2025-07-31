@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 import PageLayout from "../layout/PageLayout";
 
 interface Doctor {
@@ -39,7 +40,6 @@ const MyAppointmentsPage: React.FC = () => {
       })
       .then((res) => {
         if (res.data.success) {
-          // Filter future appointments only
           const futureAppointments = res.data.appointments.filter((a: Appointment) =>
             new Date(a.appointmentDate) >= new Date()
           );
@@ -50,27 +50,54 @@ const MyAppointmentsPage: React.FC = () => {
       })
       .catch((err) => {
         console.error("Error fetching appointments:", err);
+        toast.error("Failed to fetch appointments.");
         setList([]);
       });
   };
 
-  const handleCancel = async (appointmentId: string) => {
-    if (!window.confirm("Are you sure you want to cancel this appointment?")) return;
+  const handleCancel = (appointmentId: string) => {
+    toast((t) => (
+      <div className="text-sm">
+        <p className="font-semibold mb-2">
+          Are you sure you want to cancel this appointment?
+        </p>
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="px-3 py-1 text-sm rounded bg-gray-200 hover:bg-gray-300"
+          >
+            No
+          </button>
+          <button
+            onClick={async () => {
+              try {
+                const res = await axios.delete(
+                  `${import.meta.env.VITE_API_URL}/api/appointments/${appointmentId}`,
+                  {
+                    headers: { Authorization: `Bearer ${token}` },
+                  }
+                );
 
-    try {
-      const res = await axios.delete(`${import.meta.env.VITE_API_URL}/api/appointments/${appointmentId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (res.data.success) {
-        setList((prev) => prev.filter((a) => a._id !== appointmentId));
-      } else {
-        alert("Failed to cancel appointment.");
-      }
-    } catch (error) {
-      console.error("Cancel error:", error);
-      alert("An error occurred while canceling.");
-    }
+                if (res.data.success) {
+                  setList((prev) => prev.filter((a) => a._id !== appointmentId));
+                  toast.success("Appointment cancelled.");
+                } else {
+                  toast.error("Failed to cancel appointment.");
+                }
+              } catch (error) {
+                console.error("Cancel error:", error);
+                toast.error("An error occurred while canceling.");
+              } finally {
+                toast.dismiss(t.id);
+              }
+            }}
+            className="px-3 py-1 text-sm rounded bg-red-500 text-white hover:bg-red-600"
+          >
+            Yes, Cancel
+          </button>
+        </div>
+      </div>
+    ), { duration: 8000 });
   };
 
   return (
