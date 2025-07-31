@@ -383,15 +383,12 @@
 
 // export default SearchBar;
 
-import React, { useState, useEffect } from "react";
-import * as MdIcons from "react-icons/md";
-import { IconBaseProps } from "react-icons";
+
+  import React, { useState, useEffect } from "react";
 import { fetchApprovedDoctors } from "../../apis/doctorApi";
 import { useNavigate } from "react-router-dom";
 
-const MdLocationOn = MdIcons.MdLocationOn as React.FC<IconBaseProps>;
-const MdSearch = MdIcons.MdSearch as React.FC<IconBaseProps>;
-
+// Doctor type
 interface Doctor {
   _id: string;
   fullName: string;
@@ -400,185 +397,118 @@ interface Doctor {
   city?: string;
 }
 
-const SearchBar = () => {
-  const [cityInput, setCityInput] = useState("");
-  const [searchInput, setSearchInput] = useState("");
-  const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const [filteredDoctors, setFilteredDoctors] = useState<Doctor[] | null>(null);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+// Doctor card
+const DoctorCard = ({ doctor }: { doctor: Doctor }) => (
+  <div className="bg-white rounded-xl shadow-sm p-4 text-center transform transition-transform hover:scale-105 hover:shadow-lg duration-300">
+    <div className="w-24 h-24 mx-auto rounded-full bg-indigo-50 flex items-center justify-center">
+      <img
+        src={
+          doctor.profileImage
+            ? `${import.meta.env.VITE_API_URL}/uploads/${doctor.profileImage}`
+            : "/default-doctor.jpg"
+        }
+        onError={(e) => (e.currentTarget.src = "/default-doctor.jpg")}
+        alt={doctor.fullName}
+        className="w-20 h-20 object-cover rounded-full"
+      />
+    </div>
+    <h4 className="font-semibold text-gray-900 mt-4">{doctor.fullName}</h4>
+    <p className="text-sm text-indigo-600 mt-1">{doctor.specialization}</p>
+  </div>
+);
 
+// Grid
+const DoctorsGrid = () => {
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [city, setCity] = useState("");
   const navigate = useNavigate();
 
-  // 🔁 Fetch doctors on load
   useEffect(() => {
-    const fetchDoctors = async () => {
-      const data = await fetchApprovedDoctors();
-      const mappedDoctors = data.map((doc: any) => ({
-        _id: doc._id,
-        fullName: doc.name,
-        specialization: doc.professionalInfo?.specialization || "Not specified",
-        profileImage: doc.profilePicture || undefined,
-        city: doc.hospitalInfo?.city?.toLowerCase() || "",
-      }));
-      setDoctors(mappedDoctors);
-      setFilteredDoctors(null); // default to all
+    const fetchData = async () => {
+      if (!searchTerm && !city) {
+        setDoctors([]); // clear list when both fields are empty
+        return;
+      }
+
+      try {
+        const data = await fetchApprovedDoctors();
+        const filtered = data.filter((doc: any) => {
+          const nameMatch = doc.name
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase());
+          const specializationMatch = doc.professionalInfo?.specialization
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase());
+          const cityMatch = doc.city
+            ?.toLowerCase()
+            .includes(city.toLowerCase());
+
+          return (nameMatch || specializationMatch) && (!city || cityMatch);
+        });
+
+        const mapped = filtered.map((doc: any) => ({
+          _id: doc._id,
+          fullName: doc.name,
+          specialization: doc.professionalInfo?.specialization || "Not specified",
+          profileImage: doc.profilePicture || undefined,
+          city: doc.city,
+        }));
+
+        setDoctors(mapped);
+      } catch (error) {
+        console.error("Error fetching doctors:", error);
+      }
     };
-    fetchDoctors();
-  }, []);
 
-  // 🔄 Reset to full list when inputs cleared
-  useEffect(() => {
-    if (!searchInput.trim() && !cityInput.trim()) {
-      setFilteredDoctors(null); // null = show all
-      setSuggestions([]);
-    }
-  }, [searchInput, cityInput]);
-
-  // 🔍 Autocomplete suggestions
-  useEffect(() => {
-    if (!searchInput) {
-      setSuggestions([]);
-      return;
-    }
-    const input = searchInput.toLowerCase();
-    const matches = new Set<string>();
-    doctors.forEach((doc) => {
-      if (doc.fullName.toLowerCase().includes(input)) {
-        matches.add(doc.fullName);
-      }
-      if (doc.specialization.toLowerCase().includes(input)) {
-        matches.add(doc.specialization);
-      }
-    });
-    setSuggestions([...matches].slice(0, 6)); // max 6
-  }, [searchInput, doctors]);
-
-  const handleSearch = (term = searchInput) => {
-    const nameOrSpecialty = term.toLowerCase();
-    const city = cityInput.toLowerCase();
-
-    const filtered = doctors.filter((doctor) => {
-      const matchesSearch =
-        doctor.fullName.toLowerCase().includes(nameOrSpecialty) ||
-        doctor.specialization.toLowerCase().includes(nameOrSpecialty);
-      const matchesCity = doctor.city.includes(city);
-      return matchesSearch && matchesCity;
-    });
-
-    setFilteredDoctors(filtered);
-    setSuggestions([]);
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
-  };
-
-  const handleSuggestionClick = (value: string) => {
-    setSearchInput(value);
-    handleSearch(value);
-  };
-
-  const goToDoctorProfile = (id: string) => {
-    navigate(`/doctor-profile/${id}`);
-  };
+    fetchData();
+  }, [searchTerm, city]);
 
   return (
-    <>
-      {/* Search Panel */}
-      <div className="w-full max-w-6xl mx-auto px-4 py-6">
-        <div className="bg-[#F0F4FF] rounded-lg shadow-md p-4 flex flex-col lg:flex-row items-start lg:items-center gap-4">
-          {/* LEFT: City Input */}
-          <div className="relative w-full lg:w-1/3">
-            <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 bg-white">
-              <MdLocationOn className="text-indigo-600 text-xl mr-2" />
-              <input
-                type="text"
-                value={cityInput}
-                onChange={(e) => setCityInput(e.target.value)}
-                placeholder="Enter your city"
-                className="w-full text-sm outline-none"
-                onKeyDown={handleKeyPress}
-              />
-            </div>
-          </div>
+    <section className="py-10 px-4">
+      <h3 className="text-center text-2xl font-bold mb-4">Search for Doctors</h3>
 
-          {/* RIGHT: Search Input */}
-          <div className="relative w-full lg:w-2/3">
-            <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 bg-white">
-              <MdSearch className="text-indigo-600 text-xl mr-2" />
-              <input
-                type="text"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Search doctors by name or specialty..."
-                className="w-full text-sm outline-none"
-                onKeyDown={handleKeyPress}
-              />
-            </div>
+      <div className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search by name or specialization"
+          className="border px-4 py-2 rounded-lg focus:outline-none"
+        />
+        <input
+          type="text"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          placeholder="Search by city"
+          className="border px-4 py-2 rounded-lg focus:outline-none"
+        />
+      </div>
 
-            {/* Autocomplete Dropdown */}
-            {suggestions.length > 0 && (
-              <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
-                {suggestions.map((sugg, index) => (
-                  <div
-                    key={index}
-                    onClick={() => handleSuggestionClick(sugg)}
-                    className="cursor-pointer px-4 py-2 hover:bg-gray-100 text-sm text-gray-800"
-                  >
-                    {sugg}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+      {doctors.length > 0 ? (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-7xl mx-auto">
+          {doctors.map((doctor) => (
+            <div
+              key={doctor._id}
+              onClick={() => navigate(`/doctor-profile/${doctor._id}`)}
+              className="cursor-pointer"
+            >
+              <DoctorCard doctor={doctor} />
+            </div>
+          ))}
         </div>
-      </div>
+      ) : (
+        <p className="text-center text-gray-500 mt-10">
+          {searchTerm || city
+            ? "No matching doctors found."
+            : "Start typing to search for doctors."}
+        </p>
+      )}
 
-      {/* Filtered Results */}
-      <div className="max-w-6xl mx-auto px-4 pb-12">
-        {(filteredDoctors ?? doctors).length > 0 ? (
-          <>
-            {filteredDoctors && (
-              <h3 className="text-xl font-semibold mb-4 text-gray-800">
-                Search Results
-              </h3>
-            )}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {(filteredDoctors ?? doctors).map((doctor) => (
-                <div
-                  key={doctor._id}
-                  onClick={() => goToDoctorProfile(doctor._id)}
-                  className="cursor-pointer bg-white p-4 rounded-xl shadow hover:shadow-md transition text-center"
-                >
-                  <img
-                    src={
-                      doctor.profileImage
-                        ? `${import.meta.env.VITE_API_URL}/uploads/${doctor.profileImage}`
-                        : "/default-doctor.jpg"
-                    }
-                    onError={(e) =>
-                      (e.currentTarget.src = "/default-doctor.jpg")
-                    }
-                    alt={doctor.fullName}
-                    className="w-20 h-20 object-cover mx-auto rounded-full mb-3"
-                  />
-                  <h4 className="text-sm font-medium text-gray-900">
-                    {doctor.fullName}
-                  </h4>
-                  <p className="text-xs text-gray-600">{doctor.specialization}</p>
-                </div>
-              ))}
-            </div>
-          </>
-        ) : (
-          <p className="text-center text-gray-600 text-sm mt-8">Doctor not found</p>
-        )}
-      </div>
-    </>
+      <div className="h-16"></div>
+    </section>
   );
 };
 
-export default SearchBar;
+export default DoctorsGrid;
 
