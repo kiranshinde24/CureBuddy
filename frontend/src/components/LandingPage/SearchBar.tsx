@@ -39,7 +39,6 @@ const SearchBar = () => {
     fetchDoctors();
   }, []);
 
-  // 🔍 Autocomplete suggestions
   useEffect(() => {
     if (!searchInput) {
       setSuggestions([]);
@@ -55,7 +54,7 @@ const SearchBar = () => {
         matches.add(doc.specialization);
       }
     });
-    setSuggestions([...matches].slice(0, 6)); // limit suggestions
+    setSuggestions([...matches].slice(0, 6)); 
   }, [searchInput, doctors]);
 
   const handleSearch = (term = searchInput) => {
