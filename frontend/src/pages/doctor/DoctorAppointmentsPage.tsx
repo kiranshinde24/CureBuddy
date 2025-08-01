@@ -9,7 +9,7 @@ const DoctorAppointmentsPage: React.FC = () => {
   const [search, setSearch] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
 
-  // Fetch only upcoming appointments
+  // Fetch doctor's appointments
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -34,27 +34,8 @@ const DoctorAppointmentsPage: React.FC = () => {
         const data = await res.json();
         if (!data.success) throw new Error(data.message);
 
-        const all = data.data || [];
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const upcoming = all
-          .filter((appt) => {
-            const apptDate = new Date(appt.appointmentDate);
-            return (
-              appt.status !== "Cancelled" &&
-              appt.status !== "Completed" &&
-              apptDate >= today
-            );
-          })
-          .sort(
-            (a, b) =>
-              new Date(a.appointmentDate).getTime() -
-              new Date(b.appointmentDate).getTime()
-          );
-
-        setAppointments(upcoming);
-        setFiltered(upcoming);
+        setAppointments(data.data || []);
+        setFiltered(data.data || []);
       } catch (err: any) {
         toast.error(err.message || "Failed to fetch");
         setError(err.message || "Failed to fetch");
@@ -127,7 +108,11 @@ const DoctorAppointmentsPage: React.FC = () => {
                   if (!data.success) throw new Error(data.message);
 
                   setAppointments((prev) =>
-                    prev.filter((appt) => appt._id !== appointmentId)
+                    prev.map((appt) =>
+                      appt._id === appointmentId
+                        ? { ...appt, status: "Cancelled" }
+                        : appt
+                    )
                   );
 
                   toast.dismiss(t.id);
@@ -154,7 +139,7 @@ const DoctorAppointmentsPage: React.FC = () => {
   return (
     <div className="max-w-5xl mx-auto p-6 bg-gray-50 min-h-screen">
       <h2 className="text-2xl font-bold mb-6 text-blue-800 text-center">
-        Upcoming Appointments
+        My Appointments
       </h2>
 
       {/* Filters */}
@@ -190,7 +175,7 @@ const DoctorAppointmentsPage: React.FC = () => {
 
       {/* Appointment List */}
       {filtered.length === 0 ? (
-        <p className="text-center text-gray-500">No upcoming appointments found.</p>
+        <p className="text-center text-gray-500">No appointments found.</p>
       ) : (
         <div className="divide-y divide-gray-200 rounded-md border bg-white shadow-sm">
           {filtered.map((appt, idx) => (
@@ -237,3 +222,4 @@ const DoctorAppointmentsPage: React.FC = () => {
 };
 
 export default DoctorAppointmentsPage;
+
