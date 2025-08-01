@@ -254,7 +254,11 @@ router.get("/doctor/summary", authMiddleware(["doctor"]), async (req, res) => {
       return res.status(404).json({ success: false, message: "Doctor profile not found." });
     }
 
-    const allAppointments = await Appointment.find({ doctorId: doctorProfile._id }).sort({ appointmentDate: 1 });
+    // ✅ Filter out 'Cancelled' appointments in DB query itself
+    const allAppointments = await Appointment.find({
+      doctorId: doctorProfile._id,
+      status: { $ne: "Cancelled" } // Exclude cancelled appointments
+    }).sort({ appointmentDate: 1 });
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -290,6 +294,7 @@ router.get("/doctor/summary", authMiddleware(["doctor"]), async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
+
 router.put("/:id/cancel-by-doctor", authMiddleware(["doctor"]), async (req, res) => {
   try {
     console.log("➡️ Doctor cancel request received for appointment:", req.params.id);
