@@ -19,30 +19,39 @@ const DoctorAppointmentsPage: React.FC = () => {
       return;
     }
 
-    const fetchAppointments = async () => {
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/appointments/doctor/me`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const data = await res.json();
-        if (!data.success) throw new Error(data.message);
-
-        setAppointments(data.data || []);
-        setFiltered(data.data || []);
-      } catch (err: any) {
-        toast.error(err.message || "Failed to fetch");
-        setError(err.message || "Failed to fetch");
-      } finally {
-        setLoading(false);
+const fetchAppointments = async () => {
+  try {
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/appointments/doctor/me`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       }
-    };
+    );
+
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+
+    const upcomingAppointments = (data.data || []).filter((appt) => {
+      const appointmentDate = new Date(appt.appointmentDate);
+      const today = new Date();
+      appointmentDate.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+      return appointmentDate >= today;
+    });
+
+    setAppointments(upcomingAppointments);
+    setFiltered(upcomingAppointments);
+  } catch (err: any) {
+    toast.error(err.message || "Failed to fetch");
+    setError(err.message || "Failed to fetch");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
     fetchAppointments();
   }, []);
