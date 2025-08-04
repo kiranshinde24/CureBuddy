@@ -70,12 +70,13 @@ exports.bookAppointment = async (req, res) => {
     });
     if (existing) return res.status(400).json({ message: 'Time slot already booked' });
 
-    const newAppointment = new Appointment({
+     const newAppointment = new Appointment({
       doctorId,
-      doctorName: doctor.fullName,
+      doctorName: doctor.name,
+      doctorEmail: doctor.email, // ✅ Store doctor email in appointment
       patientId: userId,
       patientName: user.fullName,
-      patientEmail: user.email, // ✅ Email stored here
+      patientEmail: user.email,
       appointmentDate,
       appointmentTime,
     });
