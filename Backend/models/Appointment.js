@@ -10,6 +10,10 @@ const appointmentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  doctorEmail: {  // ✅ NEW field added
+    type: String,
+    required: true,
+  },
   patientId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
