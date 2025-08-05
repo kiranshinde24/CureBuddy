@@ -56,7 +56,7 @@ const MyAppointmentsPage: React.FC = () => {
   };
 
   const handleCancel = (appointmentId: string) => {
-<<<<<<< HEAD
+
   toast((t) => (
     <div className="text-sm">
       <p className="font-semibold mb-2">
@@ -103,7 +103,7 @@ const MyAppointmentsPage: React.FC = () => {
   ), { duration: 8000 });
 };
 
-=======
+
     toast((t) => (
       <div className="text-sm">
         <p className="font-semibold mb-2">
@@ -147,7 +147,6 @@ const MyAppointmentsPage: React.FC = () => {
       </div>
     ), { duration: 8000 });
   };
->>>>>>> 7ac95f55556aded38d8559b4718d6a22e76658cb
 
   return (
     <PageLayout>
