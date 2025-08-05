@@ -263,12 +263,6 @@ router.put("/:id/cancel-by-patient", authMiddleware(["patient"]), async (req, re
   }
 });
 
-
-
-
-
-
-=======
 // DELETE: Cancel appointment by ID (only patient who booked it can cancel)
 router.delete("/:id", authMiddleware(["patient"]), async (req, res) => {
   const appointmentId = req.params.id;
@@ -294,7 +288,6 @@ router.delete("/:id", authMiddleware(["patient"]), async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error." });
   }
 });
->>>>>>> 7ac95f55556aded38d8559b4718d6a22e76658cb
 // ✅ Fetch all appointments for logged-in doctor
 router.get("/doctor/me", authMiddleware(["doctor"]), async (req, res) => {
   try {
