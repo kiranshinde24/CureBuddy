@@ -201,6 +201,7 @@ router.get("/patient/:patientId", authMiddleware(["patient"]), async (req, res) 
   }
 });
 
+<<<<<<< HEAD
 // Cancel appointment by patient
 router.put("/:id/cancel-by-patient", authMiddleware(["patient"]), async (req, res) => {
   try {
@@ -267,6 +268,33 @@ router.put("/:id/cancel-by-patient", authMiddleware(["patient"]), async (req, re
 
 
 
+=======
+// DELETE: Cancel appointment by ID (only patient who booked it can cancel)
+router.delete("/:id", authMiddleware(["patient"]), async (req, res) => {
+  const appointmentId = req.params.id;
+  const userId = req.user.id;
+
+  try {
+    const appointment = await Appointment.findById(appointmentId);
+
+    if (!appointment) {
+      return res.status(404).json({ success: false, message: "Appointment not found." });
+    }
+
+    // Ensure only the patient who booked it can delete
+    if (appointment.patientId.toString() !== userId) {
+      return res.status(403).json({ success: false, message: "Unauthorized." });
+    }
+
+    await Appointment.findByIdAndDelete(appointmentId);
+
+    return res.json({ success: true, message: "Appointment cancelled." });
+  } catch (error) {
+    console.error("Error cancelling appointment:", error.message);
+    return res.status(500).json({ success: false, message: "Server error." });
+  }
+});
+>>>>>>> 7ac95f55556aded38d8559b4718d6a22e76658cb
 // ✅ Fetch all appointments for logged-in doctor
 router.get("/doctor/me", authMiddleware(["doctor"]), async (req, res) => {
   try {
