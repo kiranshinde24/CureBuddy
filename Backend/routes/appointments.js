@@ -201,7 +201,7 @@ router.get("/patient/:patientId", authMiddleware(["patient"]), async (req, res) 
   }
 });
 
-<<<<<<< HEAD
+
 // Cancel appointment by patient
 router.put("/:id/cancel-by-patient", authMiddleware(["patient"]), async (req, res) => {
   try {
