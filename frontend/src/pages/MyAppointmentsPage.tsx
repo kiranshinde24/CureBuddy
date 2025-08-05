@@ -56,54 +56,6 @@ const MyAppointmentsPage: React.FC = () => {
   };
 
   const handleCancel = (appointmentId: string) => {
-
-  toast((t) => (
-    <div className="text-sm">
-      <p className="font-semibold mb-2">
-        Are you sure you want to cancel this appointment?
-      </p>
-      <div className="flex justify-end gap-2">
-        <button
-          onClick={() => toast.dismiss(t.id)}
-          className="px-3 py-1 text-sm rounded bg-gray-200 hover:bg-gray-300"
-        >
-          No
-        </button>
-        <button
-          onClick={async () => {
-  try {
-    const res = await axios.put(
-      `${import.meta.env.VITE_API_URL}/api/appointments/${appointmentId}/cancel-by-patient`,
-      {}, // Important: Send an empty body since PUT requires one
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-
-    if (res.data.success) {
-      setList((prev) => prev.filter((a) => a._id !== appointmentId));
-      toast.success("Appointment cancelled.");
-    } else {
-      toast.error("Failed to cancel appointment.");
-    }
-  } catch (error) {
-    console.error("Cancel error:", error);
-    toast.error("An error occurred while cancelling.");
-  } finally {
-    toast.dismiss(t.id); // This line assumes you’re inside a toast with t.id
-  }
-}}
-
-          className="px-3 py-1 text-sm rounded bg-red-500 text-white hover:bg-red-600"
-        >
-          Yes, Cancel
-        </button>
-      </div>
-    </div>
-  ), { duration: 8000 });
-};
-
-
     toast((t) => (
       <div className="text-sm">
         <p className="font-semibold mb-2">
@@ -119,8 +71,9 @@ const MyAppointmentsPage: React.FC = () => {
           <button
             onClick={async () => {
               try {
-                const res = await axios.delete(
-                  `${import.meta.env.VITE_API_URL}/api/appointments/${appointmentId}`,
+                const res = await axios.put(
+                  `${import.meta.env.VITE_API_URL}/api/appointments/${appointmentId}/cancel-by-patient`,
+                  {},
                   {
                     headers: { Authorization: `Bearer ${token}` },
                   }
@@ -134,7 +87,7 @@ const MyAppointmentsPage: React.FC = () => {
                 }
               } catch (error) {
                 console.error("Cancel error:", error);
-                toast.error("An error occurred while canceling.");
+                toast.error("An error occurred while cancelling.");
               } finally {
                 toast.dismiss(t.id);
               }
