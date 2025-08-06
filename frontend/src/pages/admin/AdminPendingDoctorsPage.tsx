@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
 
 interface Doctor {
   _id: string;
@@ -16,14 +17,13 @@ const AdminPendingDoctorsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [genderFilter, setGenderFilter] = useState("");
   const [processingId, setProcessingId] = useState<string | null>(null);
-  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPendingDoctors = async () => {
       const token = localStorage.getItem("token");
       if (!token) {
-        setError("Authorization token missing. Please login again.");
+        toast.error("Authorization token missing. Please login again.");
         setLoading(false);
         return;
       }
@@ -44,7 +44,7 @@ const AdminPendingDoctorsPage: React.FC = () => {
         setDoctors(pending);
       } catch (err: any) {
         console.error("Failed to fetch pending doctors", err);
-        setError(err.message || "Something went wrong");
+        toast.error(err.message || "Something went wrong");
       } finally {
         setLoading(false);
       }
@@ -57,7 +57,7 @@ const AdminPendingDoctorsPage: React.FC = () => {
     setProcessingId(id);
     const token = localStorage.getItem("token");
     if (!token) {
-      alert("Authorization token missing. Please login again.");
+      toast.error("Authorization token missing. Please login again.");
       return;
     }
 
@@ -74,11 +74,12 @@ const AdminPendingDoctorsPage: React.FC = () => {
 
       if (result.success) {
         setDoctors((prev) => prev.filter((doc) => doc._id !== id));
+        toast.success(`Doctor ${action === "approve" ? "approved" : "rejected"} successfully.`);
       } else {
-        alert(result.message || `Failed to ${action} doctor.`);
+        toast.error(result.message || `Failed to ${action} doctor.`);
       }
     } catch {
-      alert(`Failed to ${action} doctor.`);
+      toast.error(`Failed to ${action} doctor.`);
     } finally {
       setProcessingId(null);
     }
@@ -94,14 +95,9 @@ const AdminPendingDoctorsPage: React.FC = () => {
 
   return (
     <div className="p-6 min-h-screen bg-gray-100">
+      <Toaster position="top-right" reverseOrder={false} />
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-indigo-700 mb-4">Pending Doctor Approvals</h1>
-
-        {error && (
-          <div className="mb-4 text-red-600 bg-red-100 border border-red-300 px-4 py-2 rounded">
-            {error}
-          </div>
-        )}
 
         <div className="flex flex-col md:flex-row gap-4 mb-6">
           <input
