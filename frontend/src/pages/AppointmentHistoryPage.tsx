@@ -37,10 +37,13 @@ const AppointmentHistoryPage: React.FC = () => {
           const today = new Date();
           today.setHours(0, 0, 0, 0);
 
-          const pastAppointments = res.data.appointments.filter((appt: Appointment) => {
-            const apptDate = new Date(appt.appointmentDate);
-            return apptDate < today;
-          });
+const pastAppointments = res.data.appointments.filter((appt: Appointment) => {
+  const apptDate = new Date(appt.appointmentDate);
+  const isPast = apptDate < today;
+  const isInactive = appt.status === "Cancelled" || appt.status === "Completed";
+  return isPast || isInactive;
+});
+
 
           setHistory(pastAppointments);
         } else {
@@ -91,9 +94,19 @@ const AppointmentHistoryPage: React.FC = () => {
                     {new Date(a.appointmentDate).toLocaleDateString()} &nbsp;|&nbsp;{" "}
                     {a.appointmentTime}
                   </p>
-                  <p className="text-sm font-medium text-gray-700">
-                    {a.status || "Completed"}
-                  </p>
+<p
+  className={`text-sm font-semibold rounded px-2 py-1 inline-block
+    ${
+      a.status === "Cancelled"
+        ? "text-red-600 bg-red-100"
+        : a.status === "Completed"
+        ? "text-green-600 bg-green-100"
+        : "text-yellow-700 bg-yellow-100"
+    }`}
+>
+  {a.status || "Completed"}
+</p>
+
                 </div>
               </div>
             </div>

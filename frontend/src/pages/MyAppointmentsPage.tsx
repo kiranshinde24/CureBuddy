@@ -40,10 +40,14 @@ const MyAppointmentsPage: React.FC = () => {
       })
       .then((res) => {
         if (res.data.success) {
-          const futureAppointments = res.data.appointments.filter((a: Appointment) =>
-            new Date(a.appointmentDate) >= new Date()
-          );
-          setList(futureAppointments);
+          const upcomingAppointments = res.data.appointments.filter((a: Appointment) => {
+            const date = new Date(a.appointmentDate);
+            const isUpcoming = date >= new Date();
+            const isActive = a.status !== "Cancelled" && a.status !== "Completed";
+            return isUpcoming && isActive;
+          });
+
+          setList(upcomingAppointments);
         } else {
           setList([]);
         }
@@ -56,49 +60,52 @@ const MyAppointmentsPage: React.FC = () => {
   };
 
   const handleCancel = (appointmentId: string) => {
-    toast((t) => (
-      <div className="text-sm">
-        <p className="font-semibold mb-2">
-          Are you sure you want to cancel this appointment?
-        </p>
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={() => toast.dismiss(t.id)}
-            className="px-3 py-1 text-sm rounded bg-gray-200 hover:bg-gray-300"
-          >
-            No
-          </button>
-          <button
-            onClick={async () => {
-              try {
-                const res = await axios.put(
-                  `${import.meta.env.VITE_API_URL}/api/appointments/${appointmentId}/cancel-by-patient`,
-                  {},
-                  {
-                    headers: { Authorization: `Bearer ${token}` },
-                  }
-                );
+    toast(
+      (t) => (
+        <div className="text-sm">
+          <p className="font-semibold mb-2">
+            Are you sure you want to cancel this appointment?
+          </p>
+          <div className="flex justify-end gap-2">
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="px-3 py-1 text-sm rounded bg-gray-200 hover:bg-gray-300"
+            >
+              No
+            </button>
+            <button
+              onClick={async () => {
+                try {
+                  const res = await axios.put(
+                    `${import.meta.env.VITE_API_URL}/api/appointments/${appointmentId}/cancel-by-patient`,
+                    {},
+                    {
+                      headers: { Authorization: `Bearer ${token}` },
+                    }
+                  );
 
-                if (res.data.success) {
-                  setList((prev) => prev.filter((a) => a._id !== appointmentId));
-                  toast.success("Appointment cancelled.");
-                } else {
-                  toast.error("Failed to cancel appointment.");
+                  if (res.data.success) {
+                    setList((prev) => prev.filter((a) => a._id !== appointmentId));
+                    toast.success("Appointment cancelled.");
+                  } else {
+                    toast.error("Failed to cancel appointment.");
+                  }
+                } catch (error) {
+                  console.error("Cancel error:", error);
+                  toast.error("An error occurred while cancelling.");
+                } finally {
+                  toast.dismiss(t.id);
                 }
-              } catch (error) {
-                console.error("Cancel error:", error);
-                toast.error("An error occurred while cancelling.");
-              } finally {
-                toast.dismiss(t.id);
-              }
-            }}
-            className="px-3 py-1 text-sm rounded bg-red-500 text-white hover:bg-red-600"
-          >
-            Yes, Cancel
-          </button>
+              }}
+              className="px-3 py-1 text-sm rounded bg-red-500 text-white hover:bg-red-600"
+            >
+              Yes, Cancel
+            </button>
+          </div>
         </div>
-      </div>
-    ), { duration: 8000 });
+      ),
+      { duration: 8000 }
+    );
   };
 
   return (

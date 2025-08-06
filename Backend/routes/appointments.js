@@ -201,7 +201,6 @@ router.get("/patient/:patientId", authMiddleware(["patient"]), async (req, res) 
   }
 });
 
-
 // Cancel appointment by patient
 router.put("/:id/cancel-by-patient", authMiddleware(["patient"]), async (req, res) => {
   try {
@@ -324,20 +323,24 @@ router.get("/doctor/summary", authMiddleware(["doctor"]), async (req, res) => {
     const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
 
-    const todayAppointments = allAppointments.filter((appt) => {
-      const date = new Date(appt.appointmentDate);
-      return date >= today && date < tomorrow;
-    });
+const nonCancelledAppointments = allAppointments.filter(appt => appt.status !== "Cancelled");
 
-    const upcomingAppointments = allAppointments.filter((appt) => {
-      const date = new Date(appt.appointmentDate);
-      return date >= tomorrow;
-    });
+// Then use it:
+const todayAppointments = nonCancelledAppointments.filter((appt) => {
+  const date = new Date(appt.appointmentDate);
+  return date >= today && date < tomorrow;
+});
 
-    const pastAppointments = allAppointments.filter((appt) => {
-      const date = new Date(appt.appointmentDate);
-      return date < today;
-    });
+const upcomingAppointments = nonCancelledAppointments.filter((appt) => {
+  const date = new Date(appt.appointmentDate);
+  return date >= tomorrow;
+});
+
+const pastAppointments = nonCancelledAppointments.filter((appt) => {
+  const date = new Date(appt.appointmentDate);
+  return date < today;
+});
+
 
     res.status(200).json({
       success: true,

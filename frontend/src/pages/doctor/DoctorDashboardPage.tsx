@@ -157,7 +157,7 @@ const DoctorDashboardPage: React.FC = () => {
           {[{ type: "today", title: "Today's Appointments", icon: <CalendarDays className="w-5 h-5" /> },
             { type: "upcoming", title: "Upcoming Appointments", icon: <Users className="w-5 h-5" /> }
           ].map((section, idx) => {
-            const appointments = summary[section.type];
+            const appointments = summary[section.type].filter((a: any) => a.status !== "Cancelled");
             return (
               <div key={idx} className="bg-white rounded-lg shadow-sm overflow-hidden">
                 <div className="bg-indigo-600 p-4">
