@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Swal from "sweetalert2";
+import toast, { Toaster } from "react-hot-toast";
 
 interface Patient {
   _id: string;
@@ -42,6 +42,7 @@ const AdminPatientsPage: React.FC = () => {
       .catch((err: any) => {
         console.error(err);
         setError(err.message || "Something went wrong.");
+        toast.error(err.message || "Something went wrong.");
       })
       .finally(() => setLoading(false));
   }, []);
@@ -67,41 +68,39 @@ const AdminPatientsPage: React.FC = () => {
     setFiltered(results);
   }, [search, selectedDate, patients]);
 
-  // 🧹 Handle deletion
   const deletePatient = async (id: string) => {
-    const confirm = await Swal.fire({
-      title: "Are you sure?",
-      text: "This patient will be permanently deleted.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete",
-      cancelButtonText: "Cancel",
-      confirmButtonColor: "#e53e3e",
-    });
+    const confirmed = window.confirm(
+      "Are you sure you want to permanently delete this patient?"
+    );
 
-    if (!confirm.isConfirmed) return;
+    if (!confirmed) return;
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/patients/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/admin/patients/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       const data = await res.json();
 
       if (!data.success) throw new Error(data.message);
 
       setPatients((prev) => prev.filter((p) => p._id !== id));
-      Swal.fire("Deleted!", "Patient has been removed.", "success");
+      toast.success("Patient has been successfully removed.");
     } catch (err: any) {
-      Swal.fire("Error", err.message || "Failed to delete patient", "error");
+      toast.error(err.message || "Failed to delete patient.");
     }
   };
 
   return (
     <main className="flex-1 bg-gray-100 p-8 min-h-screen">
+      <Toaster position="top-right" />
+
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
         <div>
           <h1 className="text-3xl font-bold text-indigo-700">All Patients</h1>
