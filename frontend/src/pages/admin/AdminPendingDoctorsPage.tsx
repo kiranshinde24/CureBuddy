@@ -31,7 +31,7 @@ const AdminPendingDoctorsPage: React.FC = () => {
       try {
         const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/doctors`, {
           headers: {
-            Authorization: Bearer ${token},
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -66,7 +66,7 @@ const AdminPendingDoctorsPage: React.FC = () => {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: Bearer ${token},
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -74,19 +74,19 @@ const AdminPendingDoctorsPage: React.FC = () => {
 
       if (result.success) {
         setDoctors((prev) => prev.filter((doc) => doc._id !== id));
-        toast.success(Doctor ${action === "approve" ? "approved" : "rejected"} successfully.);
+        toast.success(`Doctor ${action === "approve" ? "approved" : "rejected"} successfully.`);
       } else {
-        toast.error(result.message || Failed to ${action} doctor.);
+        toast.error(result.message || `Failed to ${action} doctor.`);
       }
     } catch {
-      toast.error(Failed to ${action} doctor.);
+      toast.error(`Failed to ${action} doctor.`);
     } finally {
       setProcessingId(null);
     }
   };
 
   const filteredDoctors = doctors.filter((doc) => {
-    const matchesSearch = ${doc.name} ${doc.email} ${doc.gender}
+    const matchesSearch = `${doc.name} ${doc.email} ${doc.gender}`
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
     const matchesGender = genderFilter ? doc.gender === genderFilter : true;
@@ -154,7 +154,7 @@ const AdminPendingDoctorsPage: React.FC = () => {
                   >
                     <td
                       className="p-4 border text-indigo-600 font-medium cursor-pointer"
-                      onClick={() => navigate(/admin/doctors/${doctor._id})}
+                      onClick={() => navigate(`/admin/doctors/${doctor._id}`)}
                     >
                       {doctor.name}
                     </td>
