@@ -29,7 +29,7 @@ const AdminPendingDoctorsPage: React.FC = () => {
       }
 
       try {
-        const res = await fetch(${import.meta.env.VITE_API_URL}/api/admin/doctors, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/doctors`, {
           headers: {
             Authorization: Bearer ${token},
           },
@@ -62,7 +62,7 @@ const AdminPendingDoctorsPage: React.FC = () => {
     }
 
     try {
-      const res = await fetch(${import.meta.env.VITE_API_URL}/api/doctors/${id}/${action}, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/doctors/${id}/${action}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
