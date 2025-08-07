@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
 
 const DoctorDetailsPage: React.FC = () => {
   const { id } = useParams();
@@ -13,9 +14,12 @@ const DoctorDetailsPage: React.FC = () => {
       const token = localStorage.getItem("token");
 
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/doctors/${id}`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/doctors/${id}`,
+          {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          }
+        );
 
         const data = await res.json();
         if (data.success) {
@@ -37,28 +41,31 @@ const DoctorDetailsPage: React.FC = () => {
   const handleStatusUpdate = async (status: "Approve" | "Reject") => {
     const token = localStorage.getItem("token");
     if (!token) {
-      alert("Authorization token missing.");
+      toast.error("Authorization token missing.");
       return;
     }
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/doctors/${id}/${status.toLowerCase()}`, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/doctors/${id}/${status.toLowerCase()}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       const result = await res.json();
       if (result.success) {
-        alert(`Doctor ${status}d successfully`);
+        toast.success(`Doctor ${status}d successfully`);
         navigate("/admin/doctors");
       } else {
-        alert(result.message || `Failed to ${status} doctor.`);
+        toast.error(result.message || `Failed to ${status.toLowerCase()} doctor.`);
       }
     } catch (err) {
       console.error(err);
-      alert(`Failed to ${status} doctor.`);
+      toast.error(`Failed to ${status.toLowerCase()} doctor.`);
     }
   };
 
@@ -68,6 +75,7 @@ const DoctorDetailsPage: React.FC = () => {
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
+      <Toaster position="top-right" reverseOrder={false} />
       <div className="max-w-4xl mx-auto bg-white p-8 rounded shadow space-y-6">
         <h2 className="text-2xl font-bold text-gray-800">Doctor Profile</h2>
 
