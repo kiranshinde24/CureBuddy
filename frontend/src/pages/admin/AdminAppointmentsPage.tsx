@@ -133,17 +133,15 @@ const AdminAppointmentsPage: React.FC = () => {
                   <td className="p-3">{appt.patientName}</td>
                   <td className="p-3">{appt.doctorName}</td>
                   <td className="p-3">
-                    {appt.appointmentDate
-                      ? new Date(appt.appointmentDate + "T00:00:00Z").toLocaleDateString(
-                          "en-IN",
-                          {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          }
-                        )
-                      : "N/A"}
-                  </td>
+  {appt.appointmentDate
+    ? new Date(appt.appointmentDate).toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+    : "N/A"}
+</td>
+
                   <td className="p-3">{appt.appointmentTime || "N/A"}</td>
                 </tr>
               ))}
