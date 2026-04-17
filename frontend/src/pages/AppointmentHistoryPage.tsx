@@ -20,10 +20,11 @@ interface Appointment {
   status?: string;
 }
 
-const AppointmentHistoryPage: React.FC = () => {
+  const AppointmentHistoryPage: React.FC = () => {
   const [history, setHistory] = useState<Appointment[]>([]);
   const token = localStorage.getItem("token");
-  const userId = token ? (jwtDecode(token) as any).id : null;
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const userId = user?._id;
 
   useEffect(() => {
     if (!userId || !token) return;
