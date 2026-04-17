@@ -25,7 +25,8 @@ interface Appointment {
 const MyAppointmentsPage: React.FC = () => {
   const [list, setList] = useState<Appointment[]>([]);
   const token = localStorage.getItem("token");
-  const userId = token ? (jwtDecode(token) as any).id : null;
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const userId = user?._id;
 
   useEffect(() => {
     fetchAppointments();
