@@ -55,7 +55,7 @@ CureBuddy is a full-stack web application that connects patients with doctors an
 ### Patient
 | Doctor List | Appointment Booking |
 |---|---|
-| ![Doctor List](screenshots/Patient_page_Doctor_List.png) | ![Appointment Booking](screenshots/Appointment_booking_page.png) |
+| ![Doctor List](screenshots/Patient_Page_Doctor_List.png) | ![Appointment Booking](screenshots/Appointment_booking_page.png) |
 
 | Appointment History |
 |---|
