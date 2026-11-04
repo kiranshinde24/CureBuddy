@@ -6,7 +6,7 @@ CureBuddy is a full-stack web application that connects patients with doctors an
 
 > ⏳ **Note:** The backend is hosted on Render's free tier and goes to sleep when idle. The first request after a while can take 30–60 seconds. Please wait a moment after opening the site.
 
-![CureBuddy Home](Screenshots/Home.png)
+![CureBuddy Home](screenshots/Home.png)
 
 ---
 
@@ -46,7 +46,7 @@ CureBuddy is a full-stack web application that connects patients with doctors an
 ### Home & Authentication
 | Home | Login |
 |---|---|
-| ![Home](Screenshots/Home.png) | ![Login](Screenshots/Login_Page.png) |
+| ![Home](screenshots/Home.png) | ![Login](screenshots/Login_Page.png) |
 
 | Patient Registration | Doctor Registration |
 |---|---|
