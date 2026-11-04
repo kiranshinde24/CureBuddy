@@ -85,12 +85,27 @@ Protected routes require the header `Authorization: Bearer <token>`.
 
 | Method | Endpoint | Description | Auth |
 |---|---|---|---|
-| POST | `/api/...` | Register a user | No |
-| POST | `/api/...` | Log in and receive a JWT | No |
-| GET | `/api/...` | List doctors | Yes |
-| POST | `/api/...` | Book an appointment | Yes |
-| GET | `/api/...` | Appointment history | Yes |
-| PUT | `/api/...` | Approve / reject a doctor (admin) | Yes (admin) |
+| POST | `/api/auth/signup` | Register a user | No |
+| POST | `/api/auth/login` | User login and JWT generation | No |
+| POST | `/api/auth/send-otp` | Send registration OTP | No |
+| POST | `/api/auth/verify-otp` | Verify registration OTP | No |
+| GET | `/api/doctors/approved` | Get approved doctors | No |
+| POST | `/api/doctors/register` | Register as a doctor | No |
+| GET | `/api/doctors/me` | Get logged-in doctor's profile | Yes (Doctor) |
+| POST | `/api/appointments/book` | Book an appointment | Yes (Patient) |
+| GET | `/api/appointments/patient/:patientId` | Get patient appointment history | Yes |
+| PUT | `/api/appointments/:id/cancel-by-patient` | Cancel appointment as patient | Yes (Patient) |
+| PUT | `/api/appointments/:id/cancel-by-doctor` | Cancel appointment as doctor | Yes (Doctor) |
+| GET | `/api/appointments/doctor/me` | Get doctor's appointments | Yes (Doctor) |
+| GET | `/api/appointments/doctor/summary` | Get doctor dashboard summary | Yes (Doctor) |
+| PATCH | `/api/doctors/:id/approve` | Approve doctor registration | Yes (Admin) |
+| PATCH | `/api/doctors/:id/reject` | Reject doctor registration | Yes (Admin) |
+| GET | `/api/admin/doctors` | Get all doctors | Yes (Admin) |
+| GET | `/api/admin/patients` | Get all patients | Yes (Admin) |
+| GET | `/api/admin/appointments` | Get all appointments | Yes (Admin) |
+| DELETE | `/api/admin/patients/:id` | Delete a patient | Yes (Admin) |
+
+**Note:** The API also includes password-reset endpoints. Doctor registration and other routes may have additional validation requirements.
 
 > Replace the `/api/...` placeholders with your real routes from the `Backend` folder.
 
