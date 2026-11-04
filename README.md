@@ -107,8 +107,6 @@ Protected routes require the header `Authorization: Bearer <token>`.
 
 **Note:** The API also includes password-reset endpoints. Doctor registration and other routes may have additional validation requirements.
 
-> Replace the `/api/...` placeholders with your real routes from the `Backend` folder.
-
 ---
 
 ## ⚙️ Local Development Setup
